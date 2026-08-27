@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: photobooth
+    env: python
+    buildCommand: |
+      pip install -r requirements.txt
+    pip install psycopg2-binary gunicorn
+      cd react-frontend && npm install && npm run build
+    startCommand: gunicorn app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: DATABASE_URL
+        fromDatabase:
+          name: photobooth-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ADMIN_PASSWORD
+        generateValue: true
+
+databases:
+  - name: photobooth-db
+    databaseName: photobooth
+    user: photobooth_user
