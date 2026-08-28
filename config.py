@@ -29,3 +29,14 @@ class Config:
     
     # Render deployment
     RENDER = os.environ.get('RENDER') == 'true'
+    
+    # AWS S3 Configuration
+    AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+    AWS_REGION = os.environ.get('AWS_REGION', 'us-east-2')
+    S3_BUCKET_NAME = os.environ.get('S3_BUCKET_NAME', 'photobooth-abby-bernie')
+    S3_TEMPLATES_PREFIX = 'templates/'
+    S3_UPLOADS_PREFIX = 'uploads/'
+    
+    # Use S3 if credentials are provided
+    USE_S3 = bool(AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY and S3_BUCKET_NAME)

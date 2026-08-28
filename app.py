@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, redirect
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from config import Config
@@ -7,6 +7,7 @@ import base64
 from datetime import datetime
 from PIL import Image
 import io
+from s3_storage import get_s3_storage
 
 app = Flask(__name__, static_folder='react-frontend/dist')
 app.config.from_object(Config)
@@ -96,24 +97,40 @@ def upload_template():
         return jsonify({'error': 'Only PNG files are allowed'}), 400
     
     filename = f"{datetime.utcnow().timestamp()}_{file.filename}"
-    filepath = os.path.join(app.config['TEMPLATES_DIR'], filename)
-    file.save(filepath)
     
-    template = Template(name=name, filename=filename)
-    db.session.add(template)
-    db.session.commit()
-    
-    return jsonify(template.to_dict()), 201
+    # Use S3 if configured, otherwise local filesystem
+    if Config.USE_S3:
+        s3 = get_s3_storage()
+        if s3.upload_template(file, filename):
+            template = Template(name=name, filename=filename)
+            db.session.add(template)
+            db.session.commit()
+            return jsonify(template.to_dict()), 201
+        else:
+            return jsonify({'error': 'Failed to upload template to S3'}), 500
+    else:
+        filepath = os.path.join(Config.TEMPLATES_DIR, filename)
+        file.save(filepath)
+        
+        template = Template(name=name, filename=filename)
+        db.session.add(template)
+        db.session.commit()
+        
+        return jsonify(template.to_dict()), 201
 
 @app.route('/api/templates/<int:template_id>', methods=['DELETE'])
 def delete_template(template_id):
     # Admin authentication would go here
     template = Template.query.get_or_404(template_id)
     
-    # Delete file
-    filepath = os.path.join(app.config['TEMPLATES_DIR'], template.filename)
-    if os.path.exists(filepath):
-        os.remove(filepath)
+    # Delete file from S3 or local filesystem
+    if Config.USE_S3:
+        s3 = get_s3_storage()
+        s3.delete_template(template.filename)
+    else:
+        filepath = os.path.join(Config.TEMPLATES_DIR, template.filename)
+        if os.path.exists(filepath):
+            os.remove(filepath)
     
     db.session.delete(template)
     db.session.commit()
@@ -140,18 +157,39 @@ def save_photo():
         image = Image.open(io.BytesIO(image_data))
         
         filename = f"{datetime.utcnow().timestamp()}.png"
-        filepath = os.path.join(app.config['UPLOADS_DIR'], filename)
-        image.save(filepath)
         
-        photo = Photo(
-            filename=filename,
-            template_id=template_id,
-            session_id=session_id
-        )
-        db.session.add(photo)
-        db.session.commit()
-        
-        return jsonify(photo.to_dict()), 201
+        # Use S3 if configured, otherwise local filesystem
+        if Config.USE_S3:
+            s3 = get_s3_storage()
+            # Convert PIL image to bytes for S3 upload
+            img_byte_arr = io.BytesIO()
+            image.save(img_byte_arr, format='PNG')
+            img_byte_arr.seek(0)
+            
+            if s3.upload_photo(img_byte_arr.read(), filename):
+                photo = Photo(
+                    filename=filename,
+                    template_id=template_id,
+                    session_id=session_id
+                )
+                db.session.add(photo)
+                db.session.commit()
+                return jsonify(photo.to_dict()), 201
+            else:
+                return jsonify({'error': 'Failed to upload photo to S3'}), 500
+        else:
+            filepath = os.path.join(Config.UPLOADS_DIR, filename)
+            image.save(filepath)
+            
+            photo = Photo(
+                filename=filename,
+                template_id=template_id,
+                session_id=session_id
+            )
+            db.session.add(photo)
+            db.session.commit()
+            
+            return jsonify(photo.to_dict()), 201
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -162,17 +200,34 @@ def get_photos():
 
 @app.route('/uploads/<filename>')
 def serve_upload(filename):
-    return send_from_directory(app.config['UPLOADS_DIR'], filename)
+    if Config.USE_S3:
+        s3 = get_s3_storage()
+        url = s3.get_photo_url(filename)
+        if url:
+            return redirect(url)
+        else:
+            return jsonify({'error': 'Photo not found'}), 404
+    else:
+        return send_from_directory(Config.UPLOADS_DIR, filename)
 
 @app.route('/templates/<filename>')
 def serve_template(filename):
-    return send_from_directory(app.config['TEMPLATES_DIR'], filename)
+    if Config.USE_S3:
+        s3 = get_s3_storage()
+        url = s3.get_template_url(filename)
+        if url:
+            return redirect(url)
+        else:
+            return jsonify({'error': 'Template not found'}), 404
+    else:
+        return send_from_directory(Config.TEMPLATES_DIR, filename)
 
 if __name__ == '__main__':
-    # Create directories if they don't exist
-    os.makedirs(app.config['TEMPLATES_DIR'], exist_ok=True)
-    os.makedirs(app.config['UPLOADS_DIR'], exist_ok=True)
-    os.makedirs(app.config['TEMP_DIR'], exist_ok=True)
+    # Create directories if they don't exist (only for local development)
+    if not Config.USE_S3:
+        os.makedirs(Config.TEMPLATES_DIR, exist_ok=True)
+        os.makedirs(Config.UPLOADS_DIR, exist_ok=True)
+        os.makedirs(Config.TEMP_DIR, exist_ok=True)
     os.makedirs('react-frontend/dist', exist_ok=True)
     
     app.run(debug=True, host='0.0.0.0', port=5000)
