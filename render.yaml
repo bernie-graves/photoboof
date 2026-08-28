@@ -3,6 +3,7 @@ services:
     name: photobooth
     env: python
     buildCommand: |
+      mkdir -p templates && mkdir -p uploads
       pip install -r requirements.txt
       pip install psycopg2-binary gunicorn
       cd react-frontend && npm install && npm run build
