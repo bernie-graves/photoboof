@@ -1,26 +1,113 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@import '@fontsource/cormorant-garamond/400.css';
+@import '@fontsource/cormorant-garamond/500.css';
+@import '@fontsource/cormorant-garamond/600.css';
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/500.css';
+
+@import 'tailwindcss';
+
+@theme {
+  --color-bone: #faf7f2; /* page background */
+  --color-sand: #f2ebe1; /* cards, alternating sections */
+  --color-ink: #2e2b27; /* body text */
+  --color-muted: #6e675e; /* secondary text */
+  --color-sage: #8e9c83; /* primary accent — decorative only, fails AA as text */
+  --color-sage-deep: #4c5645; /* headings, button fills, hover */
+  --color-clay: #c08a76; /* secondary accent, used sparingly */
+  --color-clay-deep: #96543c; /* error text — AA on bone and sand */
+  --color-gold: #b79a6b; /* hairline dividers only */
+  --color-line: #e0d7c9; /* borders */
+
+  --font-display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-bone font-sans text-base leading-relaxed text-ink;
+  }
+
+  #root {
+    @apply min-h-screen;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display font-medium leading-tight text-sage-deep;
+  }
+
+  h1 {
+    @apply text-5xl md:text-7xl;
+  }
+
+  h2 {
+    @apply text-3xl md:text-4xl;
+  }
+
+  h3 {
+    @apply text-2xl md:text-3xl;
+  }
+
+  h4 {
+    @apply text-xl md:text-2xl;
+  }
+
+  p {
+    @apply leading-relaxed;
+  }
+
+  a {
+    @apply text-inherit no-underline;
+  }
+
+  button {
+    @apply font-sans;
+  }
+
+  :focus-visible {
+    @apply ring-sage ring-offset-bone outline-none ring-2 ring-offset-2;
+  }
 }
 
-#root {
-  min-height: 100vh;
+@utility eyebrow {
+  @apply font-sans text-xs uppercase tracking-[0.12em] text-muted;
 }
 
-a {
-  text-decoration: none;
-  color: inherit;
+@utility container-page {
+  @apply container mx-auto px-6;
 }
 
-button {
-  font-family: inherit;
+@utility section-y {
+  @apply py-16 md:py-28;
+}
+
+@utility card-paper {
+  @apply rounded-md border border-line bg-sand;
+}
+
+@utility btn-base {
+  @apply inline-flex items-center justify-center gap-2 rounded-md px-8 py-3 font-sans text-sm uppercase tracking-wider motion-safe:transition-colors motion-safe:duration-200 disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+@utility btn-primary {
+  @apply btn-base bg-sage-deep text-bone hover:bg-ink;
+}
+
+@utility btn-secondary {
+  @apply btn-base border border-sage-deep bg-transparent text-sage-deep hover:bg-sand;
+}
+
+@utility field-line {
+  @apply w-full border-b border-line bg-transparent px-1 py-2 font-sans text-base text-ink placeholder:text-muted focus-visible:border-sage focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage focus-visible:ring-offset-2 focus-visible:ring-offset-bone;
+}
+
+@utility rule-gold {
+  @apply h-px w-full border-0 bg-gold;
 }

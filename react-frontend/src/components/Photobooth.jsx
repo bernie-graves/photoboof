@@ -4,7 +4,6 @@ import { ArrowLeft, Camera } from 'lucide-react'
 import TemplateSelector from './TemplateSelector'
 import PhotoCapture from './PhotoCapture'
 import ResultDisplay from './ResultDisplay'
-import './Photobooth.css'
 
 // Function to composite photos with template
 const compositePhotosWithTemplate = async (photos, template) => {
@@ -172,21 +171,28 @@ function Photobooth() {
   }
 
   return (
-    <div className="photobooth">
-      <header className="photobooth-header">
-        <Link to="/" className="back-button">
-          <ArrowLeft size={24} />
-          Back
-        </Link>
-        <h1>Photobooth</h1>
-        <div className="spacer"></div>
+    <div className="min-h-screen bg-bone">
+      <header className="border-b border-line">
+        <div className="container-page flex items-center justify-between gap-4 py-5">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 font-sans text-xs uppercase tracking-[0.12em] text-muted motion-safe:transition-colors motion-safe:duration-200 hover:text-sage-deep"
+          >
+            <ArrowLeft size={16} />
+            Back
+          </Link>
+          <h1 className="text-2xl md:text-3xl">Photobooth</h1>
+          <span className="w-16" aria-hidden="true" />
+        </div>
       </header>
 
-      <main className="photobooth-main">
+      <main className="container-page py-10 md:py-16">
         {isCompositing && (
-          <div className="compositing-overlay">
-            <div className="loading-spinner"></div>
-            <p>Creating your photobooth strip...</p>
+          <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 bg-bone/95 px-6 text-center">
+            <Camera size={28} className="text-sage-deep motion-safe:animate-pulse" aria-hidden="true" />
+            <p className="font-display text-2xl text-sage-deep md:text-3xl">
+              Creating your photobooth strip…
+            </p>
           </div>
         )}
 

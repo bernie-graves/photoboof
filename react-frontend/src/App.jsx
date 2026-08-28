@@ -3,7 +3,6 @@ import LandingPage from './components/LandingPage'
 import Photobooth from './components/Photobooth'
 import Gallery from './components/Gallery'
 import AdminPanel from './components/AdminPanel'
-import './App.css'
 
 function App() {
   return (
