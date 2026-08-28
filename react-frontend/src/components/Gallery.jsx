@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowLeft, Download, Calendar, X } from 'lucide-react'
 import BotanicalDivider from './botanical/BotanicalDivider'
+import { handleDownload as handleDownloadWithShare } from '../utils/downloadHelper'
 
 function Gallery() {
   const [photos, setPhotos] = useState([])
@@ -36,10 +37,7 @@ function Gallery() {
       console.error('Invalid photo data for download')
       return
     }
-    const link = document.createElement('a')
-    link.href = `/uploads/${photo.filename}`
-    link.download = photo.filename
-    link.click()
+    handleDownloadWithShare(`/uploads/${photo.filename}`, photo.filename)
   }
 
   const formatDate = (dateString) => {

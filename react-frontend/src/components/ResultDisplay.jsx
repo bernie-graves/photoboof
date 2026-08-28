@@ -1,13 +1,11 @@
 import { Download, Share2, RotateCcw, Image as ImageIcon } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import EucalyptusSprig from './botanical/EucalyptusSprig'
+import { handleDownload as handleDownloadWithShare } from '../utils/downloadHelper'
 
 function ResultDisplay({ image, onRetake }) {
-  const handleDownload = () => {
-    const link = document.createElement('a')
-    link.href = image
-    link.download = `photobooth-${Date.now()}.png`
-    link.click()
+  const handleDownloadClick = () => {
+    handleDownloadWithShare(image, `photobooth-${Date.now()}.png`)
   }
 
   const handleShare = async () => {
@@ -45,7 +43,7 @@ function ResultDisplay({ image, onRetake }) {
           <RotateCcw size={16} />
           Back to Photobooth
         </button>
-        <button className="btn-secondary" onClick={handleDownload}>
+        <button className="btn-secondary" onClick={handleDownloadClick}>
           <Download size={16} />
           Download
         </button>
