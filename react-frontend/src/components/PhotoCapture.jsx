@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
 import { X, Camera as CameraIcon } from 'lucide-react'
-import './PhotoCapture.css'
 
 function PhotoCapture({ template, onCapture, onCancel }) {
   const [countdown, setCountdown] = useState(null)
@@ -234,55 +233,76 @@ function PhotoCapture({ template, onCapture, onCancel }) {
   }
 
   return (
-    <div className="photo-capture">
-      <div className="capture-header">
-        <h2>Photo {currentPhoto + 1} of {PHOTOS_PER_SESSION}</h2>
-        <button className="cancel-button" onClick={handleRetakeAll}>
-          <X size={24} />
+    <div className="mx-auto max-w-2xl">
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <p className="eyebrow">Step Two</p>
+          <h2 className="mt-3 text-2xl md:text-3xl">
+            Photo {currentPhoto + 1} of {PHOTOS_PER_SESSION}
+          </h2>
+        </div>
+        <button
+          type="button"
+          aria-label="Cancel session"
+          className="rounded-md border border-line p-2 text-muted motion-safe:transition-colors motion-safe:duration-200 hover:border-sage-deep hover:text-sage-deep"
+          onClick={handleRetakeAll}
+        >
+          <X size={20} />
         </button>
       </div>
 
       {showPreview ? (
-        <div className="preview-mode">
-          <img src={photos[photos.length - 1]} alt="Captured photo" className="preview-image" />
-          <div className="preview-actions">
-            <button className="btn btn-secondary" onClick={handleRetakeCurrent}>
+        <div className="mt-8">
+          <div className="card-paper p-4">
+            <img
+              src={photos[photos.length - 1]}
+              alt="Captured photo"
+              className="mx-auto aspect-[596/626] w-full max-w-md bg-bone object-cover"
+            />
+          </div>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <button className="btn-secondary" onClick={handleRetakeCurrent}>
               Retake
             </button>
             {photos.length >= PHOTOS_PER_SESSION && (
-              <button className="btn btn-primary" onClick={() => onCapture(photos)}>
+              <button className="btn-primary" onClick={() => onCapture(photos)}>
                 Finish
               </button>
             )}
           </div>
-          <p className="preview-timer">Next photo in 1.5s...</p>
+          <p className="eyebrow mt-6 text-center">Next photo in 1.5s</p>
         </div>
       ) : (
-        <div className="camera-mode">
-          <div className="video-container">
-            <video 
-              ref={videoRef} 
-              autoPlay 
-              playsInline 
+        <div className="mt-8">
+          <div className="relative mx-auto max-w-md overflow-hidden rounded-md border border-line bg-ink">
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
               muted
-              className="camera-feed"
+              className="aspect-[596/626] w-full object-cover"
               onLoadedMetadata={handleVideoReady}
               onCanPlay={handleVideoReady}
             />
-            <div className="capture-frame" />
-            <canvas ref={canvasRef} className="hidden-canvas" />
-            
+            <div
+              className="pointer-events-none absolute inset-3 border border-bone/60"
+              aria-hidden="true"
+            />
+            <canvas ref={canvasRef} className="hidden" />
+
             {countdown !== null && (
-              <div className="countdown-overlay">
-                <div className="countdown-number">{countdown}</div>
+              <div className="absolute inset-0 flex items-center justify-center bg-ink/40">
+                <span className="font-display text-8xl leading-none text-bone md:text-9xl">
+                  {countdown}
+                </span>
               </div>
             )}
           </div>
 
-          <div className="capture-actions">
+          <div className="mt-8 flex justify-center">
             {countdown === null && (
-              <button className="btn btn-primary capture-button" onClick={startCountdown}>
-                <CameraIcon size={24} />
+              <button className="btn-primary" onClick={startCountdown}>
+                <CameraIcon size={18} />
                 Capture
               </button>
             )}
