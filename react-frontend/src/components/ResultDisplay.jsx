@@ -1,7 +1,8 @@
-import { Download, Share2, RotateCcw } from 'lucide-react'
+import { Download, Share2, RotateCcw, Image as ImageIcon } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import EucalyptusSprig from './botanical/EucalyptusSprig'
 
-function ResultDisplay({ image, onRetake, onSave }) {
+function ResultDisplay({ image, onRetake }) {
   const handleDownload = () => {
     const link = document.createElement('a')
     link.href = image
@@ -42,7 +43,7 @@ function ResultDisplay({ image, onRetake, onSave }) {
       <div className="mt-10 flex flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:justify-center">
         <button className="btn-secondary" onClick={onRetake}>
           <RotateCcw size={16} />
-          Retake
+          Back to Photobooth
         </button>
         <button className="btn-secondary" onClick={handleDownload}>
           <Download size={16} />
@@ -52,9 +53,10 @@ function ResultDisplay({ image, onRetake, onSave }) {
           <Share2 size={16} />
           Share
         </button>
-        <button className="btn-primary" onClick={onSave}>
-          Save to Gallery
-        </button>
+        <Link to="/gallery" className="btn-primary flex items-center justify-center gap-2">
+          <ImageIcon size={16} />
+          View Gallery
+        </Link>
       </div>
     </div>
   )

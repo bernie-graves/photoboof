@@ -128,6 +128,24 @@ function Photobooth() {
       const compositeImage = await compositePhotosWithTemplate(photos, selectedTemplate)
       setFinalImage(compositeImage)
       setIsCompositing(false)
+      
+      // Auto-save to gallery
+      try {
+        await fetch('/api/photos', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            photo_data: compositeImage,
+            template_id: selectedTemplate?.id,
+            session_id: Date.now().toString()
+          })
+        })
+      } catch (error) {
+        console.error('Error auto-saving photo:', error)
+      }
+      
       setStep('result')
     } else {
       setIsCompositing(false)
@@ -138,36 +156,6 @@ function Photobooth() {
     setCapturedPhotos([])
     setFinalImage(null)
     setStep('capture')
-  }
-
-  const handleSave = async () => {
-    try {
-      const response = await fetch('/api/photos', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          photo_data: finalImage,
-          template_id: selectedTemplate?.id,
-          session_id: Date.now().toString()
-        })
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to save photo')
-      }
-
-      alert('Photo saved to gallery!')
-      setStep('template')
-      setSelectedTemplate(null)
-      setCapturedPhotos([])
-      setFinalImage(null)
-    } catch (error) {
-      console.error('Error saving photo:', error)
-      alert('Failed to save photo. Please try again.')
-    }
   }
 
   return (
@@ -214,7 +202,6 @@ function Photobooth() {
           <ResultDisplay 
             image={finalImage}
             onRetake={handleRetake}
-            onSave={handleSave}
           />
         )}
       </main>
