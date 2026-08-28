@@ -63,7 +63,8 @@ class S3Storage:
             return self.s3_client.generate_presigned_url(
                 'get_object',
                 Params={'Bucket': self.bucket_name, 'Key': key},
-                ExpiresIn=expires_in
+                ExpiresIn=expires_in,
+                HttpMethod='GET'
             )
         except ClientError as e:
             print(f"Error generating template URL: {e}")
@@ -76,7 +77,8 @@ class S3Storage:
             return self.s3_client.generate_presigned_url(
                 'get_object',
                 Params={'Bucket': self.bucket_name, 'Key': key},
-                ExpiresIn=expires_in
+                ExpiresIn=expires_in,
+                HttpMethod='GET'
             )
         except ClientError as e:
             print(f"Error generating photo URL: {e}")

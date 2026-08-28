@@ -202,7 +202,10 @@ def get_photos():
 def serve_upload(filename):
     if Config.USE_S3:
         s3 = get_s3_storage()
-        url = s3.get_photo_url(filename)
+        # URL decode the filename since Flask routes are URL-encoded
+        from urllib.parse import unquote
+        decoded_filename = unquote(filename)
+        url = s3.get_photo_url(decoded_filename)
         if url:
             return redirect(url)
         else:
@@ -214,7 +217,10 @@ def serve_upload(filename):
 def serve_template(filename):
     if Config.USE_S3:
         s3 = get_s3_storage()
-        url = s3.get_template_url(filename)
+        # URL decode the filename since Flask routes are URL-encoded
+        from urllib.parse import unquote
+        decoded_filename = unquote(filename)
+        url = s3.get_template_url(decoded_filename)
         if url:
             return redirect(url)
         else:
