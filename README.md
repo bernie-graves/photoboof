@@ -23,7 +23,7 @@ A web-based photobooth application for Abby & Bernie's wedding. Users can captur
 ### Prerequisites
 
 - Python 3.11+
-- Node.js 20+
+- Node.js 20.19+ or 22.12+ (required by oxlint's native bindings)
 - npm
 
 ### Setup
