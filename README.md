@@ -49,8 +49,8 @@ A web-based photobooth application for Abby & Bernie's wedding. Users can captur
 
 4. **Configure environment variables**
    ```bash
-   # Copy .env file and configure as needed
-   # The .env file already has default values for development
+   cp .env.example .env
+   # .env.example has working defaults for development
    ```
 
 5. **Build React for production**
@@ -100,25 +100,28 @@ A web-based photobooth application for Abby & Bernie's wedding. Users can captur
 
 ```
 photoboof/
-├── app.py                  # Main Flask application
-├── config.py               # Configuration settings
-├── camera_proxy.py         # Raspberry Pi camera service (optional)
-├── templates.py            # Template compositing logic
-├── storage.py              # File storage management
-├── requirements.txt        # Python dependencies
+├── app.py                 # Flask application: API routes and database models
+├── config.py              # Configuration settings
+├── requirements.txt       # Python dependencies
 ├── render.yaml            # Render deployment configuration
-├── .env                   # Environment variables
-├── templates/             # PNG overlay templates
-├── uploads/               # Final composite images
-├── temp/                  # Temporary captured photos
+├── .env.example           # Template for the .env environment file
+├── TEMPLATE_SPECS.md      # Dimensions and layout rules for overlay templates
+├── templates/             # PNG overlay templates (created at runtime)
+├── uploads/               # Final composite images (created at runtime)
+├── temp/                  # Temporary captured photos (created at runtime)
 └── react-frontend/        # React application
     ├── src/
-    │   ├── components/    # React components
-    │   ├── App.jsx       # Main React app
-    │   └── index.css     # Global styles
-    ├── package.json      # Frontend dependencies
-    └── vite.config.js    # Vite configuration
+    │   ├── components/    # React components (capture, compositing, gallery, admin)
+    │   ├── App.jsx        # Main React app
+    │   └── index.css      # Global styles
+    ├── package.json       # Frontend dependencies
+    ├── vite.config.js     # Vite configuration (proxies /api to Flask)
+    └── dist/              # Production build served by Flask
 ```
+
+Photos are composited against the selected template in the browser (canvas) and
+posted to `/api/photos` as a base64 PNG; Flask stores the finished image and its
+database record.
 
 ## Usage
 
@@ -143,7 +146,7 @@ photoboof/
 
 ## Template Creation
 
-Templates should be PNG files with transparent areas where photos will be placed. Recommended size: 1200x1800 pixels (4x6 ratio).
+Templates should be PNG files with transparent areas where photos will be placed. Required size: 1200x1800 pixels. See [TEMPLATE_SPECS.md](TEMPLATE_SPECS.md) for the exact photo cell coordinates and layout rules.
 
 ## Troubleshooting
 
