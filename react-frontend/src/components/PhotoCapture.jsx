@@ -10,6 +10,7 @@ function PhotoCapture({ template, onCapture, onCancel }) {
   const [isVideoReady, setIsVideoReady] = useState(false)
   const videoRef = useRef(null)
   const canvasRef = useRef(null)
+  const isCapturingRef = useRef(false)
 
   const PHOTOS_PER_SESSION = 4
   const COUNTDOWN_SECONDS = 3
@@ -195,8 +196,11 @@ function PhotoCapture({ template, onCapture, onCancel }) {
 
     if (newPhotos.length >= PHOTOS_PER_SESSION) {
       // All photos captured - show preview briefly then finish
+      isCapturingRef.current = true
       setTimeout(() => {
-        onCapture(newPhotos)
+        if (isCapturingRef.current) {
+          onCapture(newPhotos)
+        }
       }, 2000)
     } else {
       // Auto-start countdown after brief preview
@@ -217,6 +221,7 @@ function PhotoCapture({ template, onCapture, onCancel }) {
 
   const handleRetakeCurrent = () => {
     setShowPreview(false)
+    isCapturingRef.current = false
     // Ensure video is reconnected to stream after preview
     if (videoRef.current && stream) {
       videoRef.current.srcObject = stream
@@ -229,6 +234,7 @@ function PhotoCapture({ template, onCapture, onCancel }) {
     setPhotos([])
     setCurrentPhoto(0)
     setShowPreview(false)
+    isCapturingRef.current = false
     onCancel()
   }
 
@@ -265,7 +271,12 @@ function PhotoCapture({ template, onCapture, onCancel }) {
               Retake
             </button>
             {photos.length >= PHOTOS_PER_SESSION && (
-              <button className="btn-primary" onClick={() => onCapture(photos)}>
+              <button className="btn-primary" onClick={() => {
+                if (!isCapturingRef.current) {
+                  isCapturingRef.current = true
+                  onCapture(photos)
+                }
+              }}>
                 Finish
               </button>
             )}
