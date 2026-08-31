@@ -15,16 +15,16 @@ A web-based photobooth application for Abby & Bernie's wedding. Users can captur
 
 - **Backend**: Python + Flask + SQLAlchemy
 - **Frontend**: React + Vite
-- **Database**: SQLite (development) / PostgreSQL (production)
+- **Database**: PostgreSQL
+- **File Storage**: AWS S3
 - **Deployment**: Render
 
 ## Local Development
 
 ### Prerequisites
 
-- Python 3.11+
-- Node.js 20.19+ or 22.12+ (required by oxlint's native bindings)
-- npm
+- Docker and Docker Compose
+- AWS S3 credentials (for file storage)
 
 ### Setup
 
@@ -33,40 +33,42 @@ A web-based photobooth application for Abby & Bernie's wedding. Users can captur
    cd photoboof
    ```
 
-2. **Set up Python environment**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   pip install -r requirements.txt
-   ```
-
-3. **Set up React frontend**
-   ```bash
-   cd react-frontend
-   npm install
-   cd ..
-   ```
-
-4. **Configure environment variables**
+2. **Configure AWS credentials**
    ```bash
    cp .env.example .env
-   # .env.example has working defaults for development
+   # Edit .env and add your AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY
    ```
 
-5. **Build React for production**
+3. **Start the application with Docker Compose**
    ```bash
-   cd react-frontend
-   npm run build
-   cd ..
+   docker compose up --build
    ```
 
-6. **Run the Flask application**
-   ```bash
-   python app.py
-   ```
+   This will:
+   - Start a PostgreSQL database
+   - Build and start the Flask application
+   - Build the React frontend
+   - Connect everything together
 
-7. **Access the application**
+4. **Access the application**
    - Open http://localhost:5000 in your browser
+
+5. **Stop the application**
+   ```bash
+   docker compose down
+   ```
+
+### Environment Variables
+
+The application requires the following environment variables:
+
+- **DATABASE_URL**: Automatically set by Docker Compose to connect to PostgreSQL
+- **SECRET_KEY**: Automatically set for local development
+- **ADMIN_PASSWORD**: Automatically set for local development
+- **AWS_ACCESS_KEY_ID**: Set from your .env file (required for S3)
+- **AWS_SECRET_ACCESS_KEY**: Set from your .env file (required for S3)
+- **AWS_REGION**: Set to us-east-2 in docker-compose.yml
+- **S3_BUCKET_NAME**: Set to photobooth-abby-bernie in docker-compose.yml
 
 ## Deployment to Render
 
@@ -178,11 +180,11 @@ photoboof/
 ├── config.py              # Configuration settings
 ├── requirements.txt       # Python dependencies
 ├── render.yaml            # Render deployment configuration
-├── .env.example           # Template for the .env environment file
+├── Dockerfile             # Container definition for Docker
+├── docker-compose.yml     # Docker Compose orchestration for local development
+├── .env.example           # Template for AWS credentials
+├── s3_storage.py         # AWS S3 storage implementation
 ├── TEMPLATE_SPECS.md      # Dimensions and layout rules for overlay templates
-├── templates/             # PNG overlay templates (created at runtime)
-├── uploads/               # Final composite images (created at runtime)
-├── temp/                  # Temporary captured photos (created at runtime)
 └── react-frontend/        # React application
     ├── src/
     │   ├── components/    # React components (capture, compositing, gallery, admin)
@@ -223,6 +225,22 @@ database record.
 Templates should be PNG files with transparent areas where photos will be placed. Required size: 1200x1800 pixels. See [TEMPLATE_SPECS.md](TEMPLATE_SPECS.md) for the exact photo cell coordinates and layout rules.
 
 ## Troubleshooting
+
+### Docker Issues
+
+**Docker daemon not running**
+- Ensure Docker Desktop is running before starting the application
+- Check that Docker has sufficient resources allocated
+
+**Container fails to start**
+- Check that port 5000 is not already in use
+- Run `docker compose logs` to see error messages
+- Ensure .env file contains valid AWS credentials
+
+**Database connection issues**
+- PostgreSQL container may need time to start up
+- Check that both containers are running: `docker compose ps`
+- The web container waits for PostgreSQL to be healthy before starting
 
 ### Camera not working
 - Ensure you've granted camera permissions

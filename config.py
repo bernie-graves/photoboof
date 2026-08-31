@@ -7,18 +7,12 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
     ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD') or 'admin123'
     
-    # Database
+    # Database (required - will fail fast if not set)
     DATABASE_URL = os.environ.get('DATABASE_URL')
-    if DATABASE_URL and DATABASE_URL.startswith('postgres://'):
-        DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
     if not DATABASE_URL:
-        DATABASE_URL = 'sqlite:///photoboof.db'
-    
-    # Storage paths
-    BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-    TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
-    UPLOADS_DIR = os.path.join(BASE_DIR, 'uploads')
-    TEMP_DIR = os.path.join(BASE_DIR, 'temp')
+        raise ValueError("DATABASE_URL environment variable is required")
+    if DATABASE_URL.startswith('postgres://'):
+        DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
     
     # Photobooth settings
     COUNTDOWN_SECONDS = 3
