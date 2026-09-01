@@ -17,7 +17,9 @@ services:
       retries: 5
 
   web:
-    build: .
+    build:
+      context: .
+      dockerfile: api/Dockerfile
     container_name: photobooth-web
     ports:
       - "5000:5000"

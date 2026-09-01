@@ -4,12 +4,14 @@ services:
     runtime: python
     plan: free
     buildCommand: |
-      pip install -r requirements.txt
+      pip install -r api/requirements.txt
       cd react-frontend && npm install && npm run build
-    startCommand: gunicorn app:app
+    startCommand: gunicorn api.app:app
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
+      - key: PYTHONPATH
+        value: /opt/render/project/src
       - key: DATABASE_URL
         fromDatabase:
           name: photobooth-db

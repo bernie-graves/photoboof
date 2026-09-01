@@ -1,7 +1,8 @@
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
+# Load .env from parent directory (root of project)
+load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
