@@ -176,14 +176,22 @@ Before deploying to Render, you need to set up AWS S3 to persist templates and p
 
 ```
 photoboof/
-├── app.py                 # Flask application: API routes and database models
-├── config.py              # Configuration settings
-├── requirements.txt       # Python dependencies
+├── api/                   # Flask API application
+│   ├── __init__.py        # Flask app factory
+│   ├── app.py             # Main application entry point
+│   ├── config.py          # Configuration settings
+│   ├── models.py          # Database models (Template, Photo)
+│   ├── requirements.txt  # Python dependencies
+│   ├── Dockerfile         # Container definition for Docker
+│   ├── routes/            # API route Blueprints
+│   │   ├── templates.py   # Template CRUD endpoints
+│   │   ├── photos.py      # Photo CRUD endpoints
+│   │   └── static.py      # Static file serving
+│   └── services/          # Business logic
+│       └── s3_storage.py  # AWS S3 storage implementation
 ├── render.yaml            # Render deployment configuration
-├── Dockerfile             # Container definition for Docker
 ├── docker-compose.yml     # Docker Compose orchestration for local development
 ├── .env.example           # Template for AWS credentials
-├── s3_storage.py         # AWS S3 storage implementation
 ├── TEMPLATE_SPECS.md      # Dimensions and layout rules for overlay templates
 └── react-frontend/        # React application
     ├── src/
@@ -196,8 +204,8 @@ photoboof/
 ```
 
 Photos are composited against the selected template in the browser (canvas) and
-posted to `/api/photos` as a base64 PNG; Flask stores the finished image and its
-database record.
+posted to `/api/photos` as a base64 PNG; the Flask API stores the finished image in S3
+and creates a database record.
 
 ## Usage
 

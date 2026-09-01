@@ -1,6 +1,6 @@
 FROM python:3.11-slim
 
-# Set working directory
+# Set working directory to app root
 WORKDIR /app
 
 # Set environment variables
@@ -16,12 +16,15 @@ RUN apt-get update && apt-get install -y \
     && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements and install Python dependencies
-COPY requirements.txt .
+# Copy API requirements and install Python dependencies
+COPY api/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
-COPY . .
+# Copy API code
+COPY api/ ./api/
+
+# Copy React frontend
+COPY react-frontend/ ./react-frontend/
 
 # Build React frontend
 WORKDIR /app/react-frontend
@@ -33,4 +36,4 @@ WORKDIR /app
 EXPOSE 5000
 
 # Run the application
-CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:5000"]
+CMD ["gunicorn", "api.app:app", "--bind", "0.0.0.0:5000"]
