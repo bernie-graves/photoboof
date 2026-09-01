@@ -18,9 +18,7 @@ function PhotoCapture({ template, onCapture, onCancel }) {
   useEffect(() => {
     startCamera()
     return () => {
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop())
-      }
+      stopCamera()
     }
   }, [])
 
@@ -101,6 +99,13 @@ function PhotoCapture({ template, onCapture, onCancel }) {
       } else {
         alert(`Unable to access camera: ${err.message || 'Unknown error'}. Please ensure you have granted camera permissions and are using HTTPS.`)
       }
+    }
+  }
+
+  const stopCamera = () => {
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop())
+      setStream(null)
     }
   }
 
@@ -197,6 +202,7 @@ function PhotoCapture({ template, onCapture, onCancel }) {
     if (newPhotos.length >= PHOTOS_PER_SESSION) {
       // All photos captured - show preview briefly then finish
       isCapturingRef.current = true
+      stopCamera()
       setTimeout(() => {
         if (isCapturingRef.current) {
           onCapture(newPhotos)
@@ -231,6 +237,7 @@ function PhotoCapture({ template, onCapture, onCancel }) {
   }
 
   const handleRetakeAll = () => {
+    stopCamera()
     setPhotos([])
     setCurrentPhoto(0)
     setShowPreview(false)
@@ -274,6 +281,7 @@ function PhotoCapture({ template, onCapture, onCancel }) {
               <button className="btn-primary" onClick={() => {
                 if (!isCapturingRef.current) {
                   isCapturingRef.current = true
+                  stopCamera()
                   onCapture(photos)
                 }
               }}>
