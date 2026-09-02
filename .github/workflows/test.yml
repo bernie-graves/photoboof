@@ -28,7 +28,7 @@ jobs:
           cd api
           pytest tests/ -v
         env:
-          DATABASE_URL: sqlite:///:memory:
+          DATABASE_URL: "sqlite:///:memory:"
           SECRET_KEY: test-secret-key
           AWS_ACCESS_KEY_ID: test-key
           AWS_SECRET_ACCESS_KEY: test-secret
