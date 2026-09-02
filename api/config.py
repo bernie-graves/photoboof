@@ -15,6 +15,9 @@ class Config:
     if DATABASE_URL.startswith('postgres://'):
         DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
     
+    # Testing mode
+    TESTING = os.environ.get('TESTING') == 'true'
+    
     # Photobooth settings
     COUNTDOWN_SECONDS = 3
     PHOTOS_PER_SESSION = 4

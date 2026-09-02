@@ -58,6 +58,22 @@ A web-based photobooth application for Abby & Bernie's wedding. Users can captur
    docker compose down
    ```
 
+### Testing
+
+Run the test suite to verify API functionality:
+
+```bash
+# Run all tests
+cd api
+pytest tests/ -v
+
+# Run tests with coverage report
+cd api
+pytest tests/ --cov=api --cov-report=html
+```
+
+The test suite covers the main API hot paths (templates, photos, S3 storage) and requires 70% minimum coverage.
+
 ### Environment Variables
 
 The application requires the following environment variables:
@@ -187,8 +203,13 @@ photoboof/
 │   │   ├── templates.py   # Template CRUD endpoints
 │   │   ├── photos.py      # Photo CRUD endpoints
 │   │   └── static.py      # Static file serving
-│   └── services/          # Business logic
-│       └── s3_storage.py  # AWS S3 storage implementation
+│   ├── services/          # Business logic
+│   │   └── s3_storage.py  # AWS S3 storage implementation
+│   └── tests/             # API test suite
+│       ├── conftest.py    # Pytest fixtures and configuration
+│       ├── test_templates.py  # Templates API tests
+│       ├── test_photos.py     # Photos API tests
+│       └── test_s3_storage.py # S3 storage service tests
 ├── render.yaml            # Render deployment configuration
 ├── docker-compose.yml     # Docker Compose orchestration for local development
 ├── .env.example           # Template for AWS credentials
