@@ -58,6 +58,22 @@ A web-based photobooth application for Abby & Bernie's wedding. Users can captur
    docker compose down
    ```
 
+### Testing
+
+Run the test suite to verify API functionality:
+
+```bash
+# Run all tests
+cd api
+pytest tests/ -v
+
+# Run tests with coverage report
+cd api
+pytest tests/ --cov=api --cov-report=html
+```
+
+The test suite covers the main API hot paths (templates, photos, S3 storage) and requires 70% minimum coverage.
+
 ### Environment Variables
 
 The application requires the following environment variables:
@@ -176,31 +192,11 @@ Before deploying to Render, you need to set up AWS S3 to persist templates and p
 
 ```
 photoboof/
-├── api/                   # Flask API application
-│   ├── __init__.py        # Flask app factory
-│   ├── app.py             # Main application entry point
-│   ├── config.py          # Configuration settings
-│   ├── models.py          # Database models (Template, Photo)
-│   ├── requirements.txt  # Python dependencies
-│   ├── Dockerfile         # Container definition for Docker
-│   ├── routes/            # API route Blueprints
-│   │   ├── templates.py   # Template CRUD endpoints
-│   │   ├── photos.py      # Photo CRUD endpoints
-│   │   └── static.py      # Static file serving
-│   └── services/          # Business logic
-│       └── s3_storage.py  # AWS S3 storage implementation
+├── api/                   # Flask API application (routes, models, services, tests)
+├── react-frontend/        # React frontend application
+├── docker-compose.yml     # Docker Compose for local development
 ├── render.yaml            # Render deployment configuration
-├── docker-compose.yml     # Docker Compose orchestration for local development
-├── .env.example           # Template for AWS credentials
-├── TEMPLATE_SPECS.md      # Dimensions and layout rules for overlay templates
-└── react-frontend/        # React application
-    ├── src/
-    │   ├── components/    # React components (capture, compositing, gallery, admin)
-    │   ├── App.jsx        # Main React app
-    │   └── index.css      # Global styles
-    ├── package.json       # Frontend dependencies
-    ├── vite.config.js     # Vite configuration (proxies /api to Flask)
-    └── dist/              # Production build served by Flask
+└── TEMPLATE_SPECS.md      # Template specifications
 ```
 
 Photos are composited against the selected template in the browser (canvas) and
